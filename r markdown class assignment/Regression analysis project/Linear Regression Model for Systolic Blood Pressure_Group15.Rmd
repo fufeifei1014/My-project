@@ -1,0 +1,539 @@
+---
+title: "Linear Regression Model for Systolic Blood Pressure"
+author: "Group 15: Feifei Fu 1006740216, Tianyu Zhang 1006740421, Wenqing Liang 1006739709"
+date: "2022-12-2"
+output: pdf_document
+---
+
+# Job Destribution and Description:
+
+| Name           | Student Number | Job Description                                         | 
+|----------------|----------------|---------------------------------------------------------|
+| Feifei Fu      | 1006740216     | Cover page, 1/3 of the model analysis                   |
+| Tianyu Zhang   | 1006740421     | Background and Significance, 1/3 of the model analysis  |
+| Wenqing Liang  | 1006739709     | Exploratory data analysis, 1/3 of the model analysis    |
+
+
+# Introduction  
+
+Background: Blood pressure is measured by two values. 
+One is called systolic blood pressure, measuring the pressure in your arteries when your heart beats and the other one is Diastolic blood pressure. (Cologne, 2022)
+
+Goal: Determine which are factors have impact on systolic blood pressure (SBP)  
+
+Core Analyses:  
+1. Correlation matrix  
+
+2. Step-wise Regression based on AIC  
+
+3. Cross validation  
+
+4. Test for outlying : studentized deleted residual, leverage test  
+
+5. Test for influence points: DFFITS, cook's distance, DFBETAS  
+
+How your data was cleaned (include the reasons why we choose some of the variables):  
+By doing the research, we found that Jun Miyata and other co-writers stated that the systolic blood pressure which measures the pressure in the arteries when the heart beats is affected more by objective factors, unlike blood pressure which can be affected by many subjective factors in the essay 'Association between high systolic blood pressure and objective hearing impairment among Japanese adults: a facility-based retrospective cohort study'. (Miyata et al., 2022)
+
+Thus, we should try to remove the variables that are more affected by subjective factors or are easily to be unstable, such as income and stress level.
+
+Therefore we should keep the following variables after cleaning the data:  
+
+(sbp, ismale, smoke_habit, exercise, age, weight, height, alcohol, trt, bmi, stress, salt, overwt).  
+
+\newpage
+# Description of Dataset
+
+## Cleaning the Blood Pressure data and Include descriptive statistics for each one of the variables 
+## And check the distribution of the response variable
+
+```{r,include=FALSE}
+# Include all the libraries we need:
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(GGally)
+library(car)
+# Read the data:
+bp_original <- read_excel("BloodPressure.xlsx")
+# Since there are non-numeric variable, we can change those variables into 1 and 0
+bp_original$ismale = 0
+bp_original$ismale[bp_original$gender == "M"] = 1
+bp_original$smoke_habit = 0
+bp_original$smoke_habit[bp_original$smoke == "Y"] = 1
+# Cleaning data by using the select function in dplyr:
+# Using piples and spcify the function is from dplyr, ow it will not knit right.
+bp <- bp_original %>%
+  dplyr::select(sbp, ismale, smoke_habit, exercise, age, weight, height, alcohol,  
+                trt, bmi, stress, salt, overwt)
+# Using glimpse to show the bloodPressure data after data cleaning:
+```
+
+```{r,include=FALSE}
+c_sbp = bp$sbp
+c_age = bp$age
+c_weight = bp$weight
+c_height = bp$height
+c_bmi = bp$bmi
+summary(c_sbp)
+round(sd(c_sbp))
+summary(c_age)
+round(sd(c_age))
+summary(c_weight)
+round(sd(c_weight))
+summary(c_height)
+round(sd(c_height))
+summary(c_bmi)
+round(sd(c_bmi))
+```
+Showing all critical value of y and all covariables such as mean, median and sd:
+
+| Variables     | Descriptions                               | Min | Q1  | Median  | Mean | 3rd Q3| Max  | SD |
+|---------------|--------------------------------------------|-----|-----|---------|------|-------|------|----|
+|   sbp         |Systolic Blood Pressure (SBP)(Continuous)   |67.0 |130.0|  140.5  |145.0 | 162.2 |224.0 | 28 |
+|  age          |Continuous variable (age years)             |18.0 |28.0 | 40.0    |52.0  |52.0   |64.0  | 13 |
+|  weight       |Continuous variable (lbs).                  |90.0 |133.0| 168.0   |166.6 |198.0  |249.0 | 41 |
+|  height       |Continuous variable (inches)                |54.0 |60.0 | 65.0    |65.33 |70.0   |77.0  | 6  |
+|  bmi.         |Continuous variable: (Weight/Height^2) x 703|11.0 |21.0 | 27.0    |27.66 |33.0   |53.0  | 9  |  
+
+## Showing all the histogram of response variable and covariables:
+We have dummy variable such as muti-levels of gender,smoke,exercise... We ignore them first:
+
+```{r,echo=FALSE}
+par(mfrow = c(2, 3))
+hist(bp$sbp, main = "Histogram of Systolic Blood Pressure")
+hist(bp$age, main = "Histogram of age")
+hist(bp$weight, main = "Histogram of weight")
+hist(bp$height, main = "Histogram of height")
+hist(bp$bmi, main = "Histogram of bmi")
+```
+And for the categorical variables: They are all normal with no obvious missing data or error when we cleaning the data in the first part of the report, we choose not to show the Histograms.  
+
+## Check the distribution of the response variable and explore the relationships between response and explanatory variables (also between explanatory variables themselves):
+
+Create the scatter plot matrix:
+
+```{r,echo=FALSE}
+pairs(bp)
+```
+
+```{r,include=FALSE}
+cor(bp[,-c(0,4)])
+```
+
+## We can also see this by heat map of ggplot:
+
+```{r,echo=FALSE}
+# Get upper triangle of the correlation matrix
+get_upper_tri <- function(cor_matrix){
+  cor_matrix[lower.tri(cor_matrix)]<- NA
+  return(cor_matrix)
+}
+library(reshape2)
+cor_matrix <- round(cor(bp[,-c(0,4)]),2)
+melted_cor_matrix <- melt(cor_matrix)
+upper_tri <- get_upper_tri(cor_matrix)
+upper_tri
+melted_cor_matrix <- melt(upper_tri, na.rm = TRUE)
+# Heatmap
+library(ggplot2)
+ggplot(data = melted_cor_matrix, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                      midpoint = 0, limit = c(-1,1), space = "Lab") +  
+  theme_minimal()+  
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()
+```
+
+Some of the cor is pententially large --> May have Multicollinearity:
+1.(weight,overwt)  
+2.(weight,bmi)  
+3.(overwt, bmi)
+And we can find that:  
+1.cor(sbp, overwt) is quiet small  
+2.cor(sbp, bmi) is quiet small  
+3.cor(sbp, weight) is quiet small 
+4.Weight line showed up two problems, this variable is worse than other variables
+5.overwt column showed up two problems, this variable is worse than other variables
+Therefore we may drop those variables in the following model selection steps, especially weight and overwt.
+
+## Explore the relationships between response and explanatory variables:  
+
+By the scatter plot matrix and correlation matrix:  
+
+| Variables                  | Cov            |     Relationship                    |
+|----------------------------|----------------|-------------------------------------|
+|"sbp" and "ismale"          | 0.002338999    | NO linear association.              |
+|"sbp" and "smoke_habit"     | 0.193448533    | weak positive linear association    |
+|"sbp" and "exercise"        | -0.14537399    | weak negative linear association    |
+|"sbp" and "age"             | 0.037463336    | NO linear association.              |
+|"sbp" and "weight"          | 0.230277555.   | weak positive linear association    |
+|"sbp" and "height"          | -0.116917759   | weak negative linear association    |
+|"sbp" and "alcohol"         | 0.13261708     | weak positive linear association    |
+|"sbp" and "trt"             | -0.12577842    | weak negative linear association    |
+|"sbp" and "bmi"             | 0.2666692719   | weak positive linear association    |
+|"sbp" and "stress"          |  0.06682121    |NO linear association                |
+|"sbp" and "salt"            | -0.02923472    | NO linear association               |
+|"sbp" and "overweight"      | 0.266564463    | weak positive linear association    |  
+
+And by the 12 observation based on the response and explanatory variables, we can see that the most associated explanatory variable is bmi which has cor(sbp, bmi) = 0.2666692719, and it is positive linear association. And there is no association between sbp and gender,stress,salt,stress.  
+
+## Explore the relationships between explanatory variables themselves:  
+
+And for other relationship between other explanatory variables:  
+We can just to find the relationship from the heat-map of corrlation matrix:  
+1. The cor(gender(ismale) and other explanatory variables) are showed with white-similar color except weight and height:  
+therefore there is no linear association with all other explanatory variables except weight and height.  
+(height and ismale), (weight and ismale) are weakly associated.  
+2. The cor(smoking and other explanatory variables) are showed with white-similar color:  
+therefore there is no linear association with all other explanatory variables.  
+3. The cor(age and other explanatory variables) are showed with white-similar color:  
+therefore there is no linear association with all other explanatory variables.  
+4. The cor(weight and other explanatory variables) are showed with white-similar color except bmi and overwt:  
+therefore there is no linear association with all other explanatory variables except bmi and overwt.  
+(weight and bmi), (weight and overwt) are highly associated.  
+5. The cor(height and other explanatory variables) are showed with white-similar color except bmi and overwt:  
+therefore there is no linear association with all other explanatory variables except bmi and overwt.  
+(height and bmi), (height and overwt) are moderately associated.  
+6. The cor(alcohol and other explanatory variables) are showed with white-similar color:  
+therefore there is no linear association with all other explanatory variables.  
+7. The cor(trt and other explanatory variables) are showed with white-similar color:  
+therefore there is no linear association with all other explanatory variables.  
+8. The cor(bmi and other explanatory variables) are showed with white-similar color except overwt:  
+(bmi and overwt) are highly associated.  
+9. The cor(stress and other explanatory variables) are showed with white-similar color:  
+therefore there is no linear association with all other explanatory variables.  
+10. The cor(salt and other explanatory variables) are showed with white-similar color:  
+therefore there is no linear association with all other explanatory variables.  
+
+\newpage
+# Building Model and Model Validation  
+
+## Main effect model:
+
+```{r,include=FALSE}
+library(knitr)
+library(xtable)
+library(olsrr)
+library(MPV)
+# We first chose all variables to build the model:
+fit1 <- lm(sbp ~ ., data=bp_original)
+summary(fit1)
+# Stepwise Regression based on AIC:
+all_model <- lm(sbp~., data = bp_original)
+null_model <- lm(sbp~1,data = bp_original)
+model_1 <- step(null_model, direction = "both",  
+                scope = list(upper = all_model, lower = null_model),trace = 0)
+# Find the R^2_adjusted value:
+summary(model_1)
+# Find the Cp,AIC,BIC,PRESS value:
+ols_mallows_cp(fit1, fit1)
+ols_mallows_cp(model_1, fit1)
+AIC(fit1)
+AIC(model_1)
+BIC(fit1)
+BIC(model_1)
+PRESS(fit1)
+PRESS(model_1)
+```
+
+We choose all variables to build the model fit1.
+Then, we apply stepwise regression based on AIC to fit1 to build model_1.
+After calculating the value of $p$, $R^2_{adj}$, $C_p$, $AIC$, $BIC$, $PRESS$, we create Table1.
+
+Table1: Comparing fit1 and model_1 based on the value of $p$, $R^2_{adj}$, $C_p$, $AIC$, $BIC$, $PRESS$
+
+|          | # of predictors | Adjusted $R^2$ | $C_p$     | $AIC$    | $BIC$    |  $PRESS$   |
+|----------|-----------------|----------------|-----------|----------|----------|------------|
+| fit1     | 17              | 0.1821         | 18        | 4670.134 | 4750.212 | 331426.4   |
+| Model_1  | 11              | 0.1875         | 8.757558  | 4660.987 | 4715.776 | 325466.7   |  
+
+We can see that  
+1.Adjusted R Squared increases  
+2.AIC, BIC and PRESS decreases
+So model_1 is better  
+  
+Then we compare model_1 with another model with limited variables, this part comes from the based part about why we choose those variables. We name the reduced model as fit2. Then, we apply stepwise regression based on AIC to fit2 to build model_2. After calculating the value of $p$, $R^2_{adj}$, $C_p$, $AIC$, $BIC$, $PRESS$, $|C_p-p'|$, we create Table2.
+
+```{r,include=FALSE}
+fit2 <- lm(sbp ~ ., data=bp)
+summary(fit2)
+# Stepwise Regression based on AIC:
+all_model2 <- lm(sbp~., data = bp)
+null_model2 <- lm(sbp~1,data = bp)
+model_2 <- step(null_model, direction = "both",  
+                scope = list(upper = all_model2, lower = null_model2),trace = 0)
+# Find the R^2_adjusted value:
+summary(model_2)
+# Find the Cp,AIC,BIC,PRESS value:
+ols_mallows_cp(fit2, fit1)
+ols_mallows_cp(model_2, fit1)
+AIC(fit2)
+AIC(model_2)
+BIC(fit2)
+BIC(model_2)
+PRESS(fit2)
+PRESS(model_2)
+```
+
+
+```{r,include=FALSE}
+fit1_p = 17
+fit2_p = 12
+model1 = 11
+model2 = 9
+
+fit1_p_prime = fit1_p+1
+fit2_p_prime = fit2_p+1
+model1_p_prime = model1+1
+model2_p_prime = model2+1
+
+criterion_cp_fit1 = abs(18 - fit1_p_prime)
+criterion_cp_fit2 = abs(15.6195 - fit2_p_prime)
+criterion_cp_model1 = abs(8.757558 - model1_p_prime)
+criterion_cp_model2 = abs(10.16681 - model2_p_prime)
+criterion_cp_fit1
+criterion_cp_fit2
+criterion_cp_model1
+criterion_cp_model2 
+```
+
+Table2: Comparing fit2, model_1 and model_2 based on the value of $p$, $R^2_{adj}$, $C_p$, $AIC$, $BIC$, $PRESS$, $|C_p-p'|$.
+
+|          | # of predictors | Adjusted $R^2$ | $C_p$     | $AIC$    | $BIC$    |  $PRESS$   | |$C_p$-$p'$| |
+|----------|-----------------|----------------|-----------|----------|----------|------------|--------------|
+| fit2     | 12              | 0.1777         | 15.6195   | 4667.976 | 4726.981 | 329923.3   | 2.6195       |
+| Model_1  | 11              | 0.1875         | 8.757558  | 4660.987 | 4715.776 | 325466.7   | 3.242442     |
+| Model_2  | 9               | 0.1818         | 10.16681  | 4662.535 | 4708.896 | 326409.6   | 0.16681      |
+
+By comparing the four models, we found that fit2 has the biggest AIC, BIC, PRESS value, so we do not consider fit2. 
+Since the values of AIC are similar and have small difference, we will compare other values.
+Then we can see that the model_2 has the smallest BIC and it's Cp is the nearest to P'.
+Therefore we think model_2 is better than fit2 and model_1.
+  
+Then we add interaction terms:  
+1.between bmi and smoke_habit.  
+2.between bmi and trt
+3.between bmi and exercise
+
+## Interaction Model with stepwise selection:
+
+```{r,include=FALSE}
+# Based on model_2, add interaction terms:
+inter_model <- lm(sbp ~ bmi+factor(smoke_habit)+factor(trt)+factor(alcohol)+  
+                    factor(exercise)+height+factor(overwt)+factor(stress)+  
+                    age+bmi:smoke_habit+bmi:factor(trt)+bmi:factor(exercise), data = bp)
+# stepwise selection:
+all_model3 <- lm(sbp ~ bmi+factor(smoke_habit)+factor(trt)+factor(alcohol)+  
+                   factor(exercise)+height+factor(overwt)+factor(stress)+  
+                   age+bmi:smoke_habit+bmi:factor(trt)+bmi:factor(exercise), data = bp)
+
+model_3 <- step(null_model, direction = "both",  
+                scope = list(upper = all_model3, lower = null_model2),trace = 0)
+# Find the R^2_adjusted value:
+summary(model_3)
+# Find the Cp,AIC,BIC,PRESS value:
+ols_mallows_cp(model_3, fit1)
+AIC(model_3)
+BIC(model_3)
+PRESS(model_3)
+```
+
+We add interaction terms bmi:smoke_habit + bmi:factor(trt) + bmi:factor(exercise) to model_2 and apply stepwise selection to it, We name the new model as model3 after calculating the value of $p$, $R^2_{adj}$, $C_p$, $AIC$, $BIC$, $PRESS$, we create Table3.
+
+Table3: Comparing model_2 and model_3 based on the value of $p$, $R^2_{adj}$, $C_p$, $AIC$, $BIC$, $PRESS$.
+
+|          | # of predictors | Adjusted $R^2$ | $C_p$     | $AIC$    | $BIC$    |  $PRESS$   |
+|----------|-----------------|----------------|-----------|----------|----------|------------|
+| Model_2  | 9               | 0.1818         | 10.16681  | 4662.535 | 4708.896 | 326409.6   |
+| Model_3  | 11              | 0.2092         | -10.17362 | 4647.468 | 4702.258 | 315880.6   |  
+
+We can see that  
+1.Adjusted R Squared increases  
+2.AIC, BIC and PRESS decreases  
+
+So model_3 is better  
+
+Added variable Plot:  
+Since all variable have no missing datas, and there is no curvilinear band in those plots, so we don't consider power model  
+
+## Then we can find the summary estimators of the final model and indicate the final model:
+
+```{r,echo=FALSE}
+kable(xtable(model_3))
+```
+
+The final regression eqution:  
+lm(formula = sbp ~ bmi + factor(smoke_habit) + factor(trt) +
+    factor(alcohol) + factor(exercise) + height + bmi:factor(trt) + 
+    bmi:factor(exercise), data = bp_original)  
+
+Interpretations:  
+$\hat{\beta_0}=82.015901$ represents the average SBP for a person with weight = 0, height = 0 and also this person is a non-smoker and not get trt, alcohol use is low, Exercise level is low is 82.015901
+$\hat{\beta_1}=1.043034$ represents keeping all other variables constant, as BMI increase by 1, average SBP increase by 1.043034  
+$\hat{\beta_2}=11.6059835$ represents keeping all other variables constant, SBP of smoker is expected greater than the SBP of non-smoker by 11.6059835  
+$\hat{\beta_3}=17.366650$ represents keeping all other variables constant, SBP of the person got trt is expected greater than the SBP of the person did not get trt by 17.366650  
+$\hat{\beta_4}=1.066213$ represents keeping all other variables constant, SBP of alcohol use is Medium level is expected greater than the SBP of alcohol use is low level by 1.066213  
+$\hat{\beta_5}=12.008438$ represents keeping all other variables constant, SBP of alcohol use is high level is expected greater than the SBP of alcohol use is low level by 12.008438  
+$\hat{\beta_6}=-14.712420$ represents keeping all other variables constant, SBP of Exercise level is medium is expected lower than the SBP of Exercise level is low by 14.712420  
+$\hat{\beta_7}=-32.353483$ represents keeping all other variables constant, SBP of Exercise level is high is expected lower than the SBP of Exercise level is low by 32.353483  
+$\hat{\beta_8}=0.496801$ represents keeping all other variables constant, as height increase by 1, average SBP increase by 0.496801  
+$\hat{\beta_9}=-1.070625$ represents keeping all other variables constant, the difference between the slope of bmi (same or fixed) for "the person got trt" and the slope of bmi (same or fixed) for "the person did not get trt". And that difference in slope is -1.070625  
+$\hat{\beta_10}=0.1722332$ represents keeping all other variables constant, the difference between the slope of bmi (same or fixed) for Exercise level is medium and the slope of bmi (same or fixed) for Exercise level is low. And that difference in slope is 0.1722332  
+$\hat{\beta_10}=0.806252$ represents keeping all other variables constant, the difference between the slope of bmi (same or fixed) for Exercise level is high and the slope of bmi (same or fixed) for Exercise level is low. And that difference in slope is 0.806252  
+
+
+## Cross-validation
+
+```{r,include=FALSE}
+##### Obtain "training" and "validation" sets
+bp_interaction <- bp
+bp_interaction$interaction1 = bp$bmi*bp$trt
+bp_interaction$interaction2 = bp$bmi*bp$exercise
+set.seed(15)
+n = nrow(bp)
+bp.cv.samp <- sample(1:n, round(0.5*n), replace=FALSE)
+bp.cv.in <- bp_interaction[bp.cv.samp,]
+bp.cv.out <- bp_interaction[-bp.cv.samp,]
+##### Fit model for training set
+model3.cv.in <- lm(formula = sbp ~ bmi + factor(smoke_habit) + factor(trt) +   
+                     factor(alcohol) + factor(exercise) + height +   
+                     bmi:factor(trt) + bmi:factor(exercise), data=bp.cv.in)
+anova(model3.cv.in)
+summary(model3.cv.in)
+##### Obtain Predicted values and prediction errors for validation sample
+##### Regression is based on same predictors
+##### Compute MSPR
+pred.cv.out <- predict(model3.cv.in, bp.cv.out[,c(10,3,9,8,4,7,14,15)])
+delta.cv.out <- bp_interaction[-bp.cv.samp,]-pred.cv.out
+n.star = dim(bp.cv.out)[1]
+MSPR <- sum((delta.cv.out)^2)/n.star
+MSPR
+```
+
+Finding: 1.MSPR = 228194.4 and the MSE = 594.7  
+2.MSPR is far away from MSE, so the validation told us that the model is still important and useful,  
+but the "out of sample" predictive power of the final model is weak.  
+
+# Model Diagnostics
+## Line assumption
+
+```{r, echo=FALSE}
+resid = model_3$residuals
+par(mfrow=c(2,3))
+plot(model_3)
+hist(resid)
+```
+
+There is no pattern in the residual plot, the QQ line of residual plot is close to the line(y=x) and the histogram of residual plot looks normal. So, the assumptions of linearity, normality, independent and equal variance are satisfied.
+Therefore, we don't need to do the Box-Cox transformation.
+
+## Outerliers and influential observations
+
+Check the outerliers by graph:
+
+```{r,echo=FALSE}
+library(ggpubr)
+library(olsrr)
+library(datasets)
+
+p1 <- ols_plot_resid_lev(model_3)
+```
+
+By the R diagnostic graphs, the outliers and leverage is shown above.
+
+Check the influential observations by hand:
+
+```{r,include=FALSE}
+p.prime = length(model_3$coefficients)
+n = nrow(bp)
+```
+
+The influential observations, DFFITS perspective:
+
+```{r,echo=FALSE}
+DFFITS <- dffits(model_3)
+which(abs(DFFITS) > 2*sqrt(p.prime/n))
+```
+
+The influential observations, cook distance:
+
+```{r,echo=FALSE}
+D = cooks.distance(model_3)
+which(D > qf(0.2, p.prime, n-p.prime))
+```
+
+The influential observations, DFBETAS perspective:
+
+```{r,echo=FALSE}
+DFBETAS <- dfbetas(model_3)
+which(DFBETAS > 2/sqrt(n))
+```
+
+- From the DFFITS perspective, there are 18 influential observations, which are item: 32 45 85 104 128 145 231 243 277 279 293 339 355 366 375 403 406 474
+
+- From the cook distance perspective, there are 0 influential observations.
+
+- From the DFBETAS perspective, there are 195 influential observations.
+
+Check the leverages by hand:
+
+```{r,include=FALSE}
+# Outlying in X observations
+hii = hatvalues(model_3)
+which(hii > 2*p.prime/n)
+```
+
+There are 19 leverage points, which are item: 4 9 12 14 40 61 86 87 163 234 241 254 297 406 414 416 461 485 487
+
+Check the outlying points by hand:
+
+```{r,include=FALSE}
+# Outlying Points
+t = rstudent(model_3)
+t.crit = qt(1-0.05/(2*n), n-p.prime-1)
+which(abs(t)>t.crit)
+```
+There is 0 outlying points in Y observations.
+
+# Conclusion
+## Summarize findings:  
+Those factors are gonna make true and most effective impact on systolic blood pressure:  
+1. bmi  
+2. Smoking Status  
+3. Treatment (for hypertension)  
+4. Alcohol use  
+5. Exercise level  
+6. Height  
+7. Interaction term between bmi and treatment  
+8. Interaction term between bmi and exercise  
+
+## limitations of our study:  
+1. validation step told us the"out of sample" predictive power of the final model is weak  
+2. Too much influential observation (outliers and influential point)  
+3. Have the multicollinearity problem result from interaction term  
+
+## Suggest future directions/extensions:  
+1. Try to collect more specific data, increase the sample size, we can also use Time series such as SARIMA model to predicts future values  
+2. Further investigate influence observations, try to deal with them and fit a better model  
+
+# Reference  
+1.Miyata, J., Umesawa, M., Yoshioka, T. et al. Association between high systolic blood pressure and objective hearing impairment among Japanese adults: a facility-based retrospective cohort study. Hypertens Res 45, 155–161 (2022). https://doi.org/10.1038/s41440-021-00737-8/  
+  
+2.Kristine Thorndyke (2022). Understand Subjective vs Objective Data: https://testprepnerds.com/nclex/subjective-vs-objective-data/
+
+3.Cologne (2022).Institute for Quality and Efficiency in Health Care (IQWiG): https://www.ncbi.nlm.nih.gov/books/NBK279251/
+
+
+
+
+
+
+
+
+
+
+

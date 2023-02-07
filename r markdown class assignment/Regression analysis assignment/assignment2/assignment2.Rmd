@@ -1,0 +1,369 @@
+---
+title: "STAC67 A2"
+author: "Feifei Fu 1006740216 Wenqing Liang 1006739709"
+output: pdf_document
+date: '2022-10-19'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Question1
+
+## a)
+
+
+```{r}
+data <- read.table("vote-1.txt", header = TRUE)
+set.seed(1006740216)
+
+## step1
+n = nrow(data)
+x = data$growth
+e = rnorm(n,0,3.9)
+y = 46.3 + 4*x + e
+
+## step2
+lm = lm(y~x)
+``` 
+
+```{r}
+summary(lm)
+mean(x)
+```
+$\hat{\beta_0}$ = 44.0380
+
+$\hat{\beta_1}$ = 4.0651
+
+
+## By hand, 95% CI = ($\hat{y}$ - $t_{0.975,n-2} * se(\hat{y})$ , $\hat{y}$ + $t_{0.975,n-2} * se(\hat{y})$)
+
+$\hat{y}$ = 44.0380 + 0.1 * 4.0651 = 44.44451
+
+$\hat{\sigma}$ = 4.358
+```{r}
+qt(0.975, n-2)
+44.44451 + qt(0.975, n-2) * sqrt((1/n + ((0.1 - mean(x))^2 / sum((x - mean(x))^2))) * 4.358^2 )
+44.44451 - qt(0.975, n-2) * sqrt((1/n + ((0.1 - mean(x))^2 / sum((x - mean(x))^2))) * 4.358^2 )
+```
+
+
+## Therefore, 95% CI = (40.55565, 48.33337)
+
+```{r}
+predict(lm, data.frame(x=0.1) ,interval = "confidence")
+```
+## By R, 95% CI = (40.55606, 48.33294) is close to the result by hand.
+
+
+## b)
+
+```{r}
+set.seed(1006740216)
+beta0 <- c()
+beta1 <- c()
+
+for (i in 1:10000){
+  
+ x = data$growth
+ e = rnorm(n,0,3.9)
+ y = 46.3 + 4*x + e
+ lm = lm(y~x)
+
+beta0[i] = summary(lm)$coefficients[1]
+beta1[i] = summary(lm)$coefficients[2]
+}
+ 
+```
+
+## The histogram of $\beta{0}$:
+
+```{r}
+mean0 = 46.3
+sd0 = sqrt(3.9^2 * (1/n+(mean(x))^2/sum((x-mean(x))^2)))
+sd0
+meannew = mean(beta0)
+meannew
+sdnew = sd(beta0)
+sdnew
+```
+mean of the theoretical distribution = $\beta{0}$ = 46.3
+sd of the theoretical distribution = 1.680853
+mean of 10,000 estimates = 46.29947
+standard deviation of 10,000 estimates = 1.677881
+
+```{r}
+ggplot(data.frame(beta0), aes(beta0)) + 
+  geom_histogram(bins=20, aes(y=..density..)) + 
+  stat_function(fun = dnorm , n = 10000, args = list(mean = meannew, sd = sdnew), col = 'blue') +
+  stat_function(fun = dnorm , n = 10000, args = list(mean = mean0, sd = sd0), col = 'red')
+```
+For $\beta{0}$, for the plot and the number is very close, we can see the results are consistent with theoretical values.
+
+
+## The histogram of $\beta{1}$:
+
+```{r}
+mean1 = 4
+sd1 = sqrt(3.9^2/sum((x-mean(x))^2))
+sd1
+meannew1 = mean(beta1)
+meannew1
+sdnew1 = sd(beta1)
+sdnew1
+```
+
+mean of the theoretical distribution = $\beta{1}$ = 4
+sd of the theoretical distribution = 0.721568
+mean of 10,000 estimates = 4.00176
+standard deviation of 10,000 estimates = 0.7247481
+
+```{r}
+ggplot(data.frame(beta1), aes(beta1)) + geom_histogram(bins=20, aes(y=..density..))  + stat_function(fun = dnorm , n = 10000, args = list(mean = meannew1, sd = sdnew1), col = 'blue') + stat_function(fun = dnorm , n = 10000, args = list(mean = mean1, sd = sd1), col = 'red')
+```
+For $\beta{1}$, for the plot and the number is very close, we can see the results are consistent with theoretical values.
+
+Therefore, the mean and standard deviation of 10,000 estimates $\beta{1}$ and $\beta{0}$ is consistent with theoretical values.
+
+## c)
+
+E(Y|X=0.1) = 46.3 + 4*0.1 = 46.7
+
+```{r}
+
+num = 0
+eyx = 46.7
+
+for (i in 1:10000){
+  
+ x = data$growth
+ e = rnorm(n, 0, 3.9)
+ y = 46.3 + 4*x + e
+ lm = lm(y~x)
+ 
+ conf1 = predict(lm, data.frame(x=0.1) ,interval = "confidence")
+ 
+ low = conf1[2]
+ high = conf1[3]
+ 
+ if (eyx<high & eyx>low) {
+   num = num + 1
+   }
+ 
+}
+
+num/10000
+```
+Proportion of the 10,000 confidence intervals for E(Y|X=0.1) includes E(Y|X=0.1) is: 0.9517
+
+The 95% CI means that 95% of the confidence intervals will contain the value of E(Y|X=0.1).
+
+0.9517 is very close to the 95%. So this result is consistent with theoretical expressions.
+
+\newpage
+# Question2
+
+## a)
+
+```{r}
+data2 <- read.csv("NBAhtwt.csv")
+head(data2)
+
+n = 505
+x = data2$Height
+y = data2$Weight
+lm2 = lm(y~x)
+
+summary(lm2)
+```
+
+
+## By hand, 95% CI = ($\hat{y}$ - $t_{0.975,n-2} * se(\hat{y})$ , $\hat{y}$ + $t_{0.975,n-2} * se(\hat{y})$)
+
+
+```{r}
+-279.8693 + 6.3307 * 74
+```
+$\hat{y}$ = -279.8693 + 74 * 6.3307 = 188.6025
+
+```{r}
+qt(0.975, n-2)
+188.6025 + qt(0.975, 503) * sqrt((1/n + (74 - mean(x))^2 / sum((x - mean(x))^2)) * 15.24^2 )
+188.6025 - qt(0.975, 503) * sqrt((1/n + (74 - mean(x))^2 / sum((x - mean(x))^2)) * 15.24^2 )
+
+```
+
+## Therefore, by hands, 95% CI is (186.2359, 190.9691)
+
+By R:
+
+```{r}
+n = 505
+x = data2$Height
+y = data2$Weight
+lm2 = lm(y~x)
+predict(lm2, data.frame(x=74) ,interval = "confidence")
+```
+
+## Therefore, by R, 95% CI is (186.2397, 190.972) is close to the result by hand.
+
+
+
+## b)
+
+$\hat{y}$ = -279.8693 + 74 * 6.3307 = 188.6025
+
+```{r}
+qt(0.975, n-2)
+188.6025 + qt(0.975, n-2) * sqrt((1+ 1/n + (74 - mean(x))^2 / sum((x - mean(x))^2)) * 15.24^2 )
+188.6025 - qt(0.975, n-2) * sqrt((1+ 1/n + (74 - mean(x))^2 / sum((x - mean(x))^2)) * 15.24^2 )
+```
+
+## Therefore, by hand, 95% prediction interval for a new player with $X_{0}$ = 74 is (158.5672, 218.6378).
+
+By R,
+```{r}
+predict(lm2, data.frame(x=74) ,interval = "predict")
+```
+
+## Therefore, by hand, 95% prediction interval for a new player with $X_{0}$ = 74 is (158.5761, 218.6356).
+
+\newpage
+## c)
+
+```{r}
+anova(lm2)
+```
+
+The anova table is above.
+
+```{r}
+240985/(240985 + 116782)
+```
+## $R^2$ = SSR/SST = SSR/(SSR+SSE) = 240985/(240985 + 116782) = 0.6735809
+## $R^2$: 67.35809\% variation in weight can be explained by height.
+
+
+## d)
+
+```{r}
+plot(lm2$fitted.values, lm2$residuals)
+abline(c(0,0))
+```
+## The plot looks random but the variance might not be constant 
+
+\newpage
+## e).
+
+```{r}
+qqnorm(lm2$residuals)
+qqline(lm2$residuals)
+```
+
+
+$H_0$: the errors are normally distributed
+$H_1$: the errors are not normally distributed
+
+```{r}
+shapiro.test(lm2$residuals)
+```
+
+## Since the p-value is equal to 0.08593, which is bigger than 0.5, we don't have sufficient evidence to reject $H_0$. Fail to reject $H_0$, so errors are normally distributed.
+
+
+\newpage
+## f).
+
+```{r}
+data3 <- data2 %>% mutate(belowmedian = Height<median(Height))
+data3_1 <- data3 %>% filter(belowmedian)
+data3_2 <- data3 %>% filter(!belowmedian)
+glimpse(data3_1)
+glimpse(data3_2)
+```
+
+```{r}
+n1 <- nrow(data3_1)
+n2 <- nrow(data3_2)
+lm3_1 <- lm(Weight ~ Height, data3_1)
+lm3_2 <- lm(Weight ~ Height, data3_2)
+di1 <- abs(lm3_1$residuals - median(lm3_1$residuals))
+di2 <- abs(lm3_2$residuals - median(lm3_2$residuals))
+d1 <- mean(di1)
+d2 <- mean(di2)
+s1_sq <- var(di1)
+s2_sq <- var(di2)
+var <- ((n1-1)*s1_sq + (n2-1)*s2_sq) / (n1 + n2 -2)
+(d1 - d2) / sqrt(var*(1/n1 + 1/n2))
+qt(0.975, n1 + n2 -2)
+```
+
+## Since $|t_{BF}| = 2.519727$, which is bigger than $t_{0.975, n-2} = 1.964691$, we have enough evidence to reject $H_0$. Thus, the error variance varies.
+
+
+\newpage
+## g).
+
+```{r}
+library(MASS)
+result = boxcox(lm)
+lambda = result$x[which.max(result$y)]
+X = data2$Height
+Y = data2$Weight
+k2 = exp(sum(log(y)) / n)
+k1 = 1 / (lambda * k2^(lambda - 1))
+w = k1 * (y^lambda - 1)
+newlm = lm(w ~ X)
+```
+
+```{r}
+qqnorm(newlm$residuals)
+qqline(newlm$residuals)
+```
+
+$H_0$: the errors are normally distributed
+$H_1$: the errors are not normally distributed
+
+```{r}
+shapiro.test(newlm$residuals)
+```
+
+
+## Since p-value = 0.5954, which is bigger than $\alpha$, we don't have enough to reject $H_0$.
+## Fail to reject $H_0$, so the errors are normally distributed.
+
+
+```{r}
+data3 <- data2 %>% mutate(belowmedian = Height<median(Height)) %>% mutate(w = k1 * (Weight^lambda - 1))
+data3_1 <- data3 %>% filter(belowmedian)
+data3_2 <- data3 %>% filter(!belowmedian)
+glimpse(data3_1)
+glimpse(data3_2)
+```
+
+
+
+```{r}
+n1 <- nrow(data3_1)
+n2 <- nrow(data3_2)
+lm3_1 <- lm(w ~ Height, data3_1)
+lm3_2 <- lm(w ~ Height, data3_2)
+di1 <- abs(lm3_1$residuals - median(lm3_1$residuals))
+di2 <- abs(lm3_2$residuals - median(lm3_2$residuals))
+d1 <- mean(di1)
+d2 <- mean(di2)
+s1_sq <- var(di1)
+s2_sq <- var(di2)
+var <- ((n1-1)*s1_sq + (n2-1)*s2_sq) / (n1 + n2 -2)
+(d1 - d2) / sqrt(var*(1/n1 + 1/n2))
+qt(0.975, n1 + n2 -2)
+```
+
+## Since $|t_{BF}| = 0.09923723$, which is smaller than $t_{0.975, n-2} = 1.964691$, we don't have enough evidence to reject $H_0$. Thus, the error variance is equal.
+
+
+
+
+

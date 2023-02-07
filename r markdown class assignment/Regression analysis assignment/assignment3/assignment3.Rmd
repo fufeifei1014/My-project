@@ -1,0 +1,158 @@
+---
+title: "A3Q4Q5"
+author: "Tianyu Zhang and Feifei Fu"
+date: "2022/11/9"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+## Import the data from csv file:
+```{r}
+infection_fulldata <- read.csv("Infections.csv")
+names(infection_fulldata) = c("Y","X1","X2","X3")
+infect_data = infection_fulldata[,1:4]
+```
+(a)
+```{r}
+## Create the scatter plot matrix
+pairs(infect_data)
+```
+\newpage
+```{r}
+## Create the correlation matrix
+cor(infect_data)
+```
+```{r}
+## Interpret:
+```
+
+By the scatter plox matrix:
+1. We can see that all the points in scatter plox for Y and X1 are having sort of line patten, so there may have moderate positive linear association between Y and X1;
+2. We can see that all the points in scatter plox for Y and X2 are having no patten and is actually a mess, therefore Y and X2 may not having any association;
+3. We can see that all the points in scatter plox for Y and X3 are having a positive line patten, so there may have a strong positive linear association between Y and X3;
+```{r}
+############################################
+```
+
+By the correlation matrix:
+1. We can see that from the correlation matrix, corr(Y,X1) = 0.5878580, so Y and X1 are having a moderate positive linear association;
+2. We can see that from the correlation matrix, corr(Y,X2) = 0.01109340, it is close to 0, so Y and X2 are having a weak association;
+3. We can see that from the correlation matrix, corr(Y,X3) = 0.92979478, so Y and X3 are having a strong positive linear association;
+```{r}
+############################################
+```
+And we don't need to concern about multi-collinearity since the association between X and another X are weak: corr(X1,X2) = 0.1889140, corr(X2,X3) = -0.05882316, corr(X1,X3) = 0.4092652
+
+\newpage
+(b)
+```{r}
+fit = lm(Y~X1+X2+X3, data = infect_data)
+summary(fit)
+```
+Estimated regression function: 
+$\hat{Y} = -11.94805 + 1.08827{X_1} + 0.02568 {X_2} + 0.03646{X_3}$
+Interpret $\hat{\beta_2}$:
+Holding other variables(X1,X3) uncahnge, When age increase 1 year, the average infection will increase 0.02568%.
+\newpage
+(c)
+Step 1: H0: $\beta1 = \beta2 = \beta3 = 0$
+Alrernative: Ha: at least one of the $\beta1,\beta2,\beta3$ is not 0
+Decision rule :   
+1. Reject H0 if the test statistic > critical value  
+2. Reject H0 if the P-value < $\alpha$  
+
+By the summary table in (b), we can see that the P-value is 2.2e-16  
+Conclusion: Since P-value = 2.2e-16 < $\alpha = 0.05$, we reject H0:$\beta1 = \beta2 = \beta3 = 0$
+so at least one of the $\beta1,\beta2,\beta3$ is not 0, there is a linear association between X1,X2, X3 therfore there is a regression relation.
+
+
+(d)
+By the summary table in (b), we can see that $R^2 = 0.9163$ and $R^2_{adjusted} = 0.914$
+$R^2$ means 91.63% variation in Y(infection) can be explained by the model(i.e. its linear relationship with X1,X2,X3)  
+And $R^2_{adjusted}$ is a modified measure that accounts for the number of variables in the model.
+It does not have a actual meaning of interpretation.
+
+
+(e)
+```{r}
+set = data.frame(X1 = 10, X2 = 45, X3 = 150)
+predict(fit, set, level = 0.9, interval = "predict")
+```
+Interpretation:
+When the average length of stay of all patients in hospital is 10, the average age of patients is 45 and the average number of beds in hospital during study periods is 150, We have 90% confidence for an infection rate in the hospital is between 1.336972% and  9.782117%.
+
+## Q5
+
+(a)
+```{r}
+infection <- read.csv("Infections.csv")
+dataq5 <- infection[,c(1,4,6)]
+glimpse(dataq5)
+```
+
+```{r}
+fit <- lm(Infections ~ Beds * Region, dataq5)
+summary(fit)
+```
+
+The model: $Infections$ = $\beta_0 + \beta_1*Beds + \beta_2*I(NE) + \beta_3*I(S) + \beta_4*I(W) + \beta_5*Beds*I(NE) + \beta_6*Beds*I(S) + \beta_7*Beds*I(W)$ 
+
+= $-0.793438 + 0.038005*Beds -1.226376*I(NE) - 0.531393*I(S) + 0.101267*I(W) + 0.012096*Beds*I(NE) + 0.001573*Beds*I(S) - 0.004480*Beds*I(W)$
+
+Estimate regression function for NE : $-2.019814 + 0.050101*Beds$
+
+Estimate regression function for S : $-1.324831 + 0.036432*Beds$
+
+Estimate regression function for W : $-0.692171 + 0.033525*Beds$
+
+Estimate regression function for NC : $-0.793438 + 0.038005*Beds$
+
+
+```{r}
+ggplot(dataq5, aes(x=Beds, y = Infections, color = factor(Region))) + 
+  geom_point() + geom_smooth(formula='y ~ x', method = 'lm', se = FALSE)
+```
+
+(b)
+$H_0 : \beta_5 = \beta_6 = \beta_7 =0$
+
+$H_{\alpha}$ : at least one of $\beta_5, \beta_6, \beta_7$ not equal to 0.
+
+```{r}
+newfit <- lm(Infections ~ Beds + Region, dataq5)
+anova(newfit,fit)
+```
+
+For p-value is 0.003516, It is < 0.05, we reject $H_0$. That means at $\alpha$ = 0.05, the slopes are not same at different regions.
+
+(c) We will choose the model with different slope because this model is a full model with interaction.
+
+(d) 
+```{r}
+par(mfrow = c(2,2))
+plot(fit)
+```
+
+The standard assumptions is not satisfied. From the plot, we can see that the residuals is not normal (from the q-q plot, the residuals is not on normal line) and violates constant variance (The residuals on the left are denser). 
+
+(e)
+```{r}
+library(MASS)
+fit_boxcox = boxcox(fit)
+lambda = fit_boxcox$x[which.max(fit_boxcox$y)]
+```
+```{r}
+y <- dataq5$Infections
+n <- nrow(dataq5)
+k2 <- exp(sum(log(y))/n)
+k1 <- 1/(lambda*k2^(lambda-1))
+w <- k1*(y^lambda-1)
+result <- lm(w~Beds+Region,dataq5)
+par(mfrow = c(2,2))
+plot(result)
+```
+
+It fits better. The constant variance are improved but The distribution is still not very uniform (The residuals on the left are denser). From the qq plot, we can see that the residuals more normal.

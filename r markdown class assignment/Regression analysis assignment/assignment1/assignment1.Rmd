@@ -1,0 +1,270 @@
+---
+title: "C67 a1"
+output: pdf_document
+date: "2022-10-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,include=FALSE}
+library(tidyverse)
+library(gridExtra)
+```
+
+
+# Question 1A
+
+
+```{r}
+set.seed(1006740421)
+a=rnorm(100,mean=100,sd=20)
+df1 = data.frame(a)
+b=rnorm(1000,mean=100,sd=20)
+df2 = data.frame(b)
+c=rnorm(10000,mean=100,sd=20)
+df3 = data.frame(c)
+d=rnorm(100000,mean=100,sd=20)
+df4 = data.frame(d)
+
+```
+
+```{r}
+
+p1<-ggplot(df1,aes(a))+geom_histogram(bins=10,aes(y=..density..))+geom_density(col="blue")
+
+p2<-ggplot(df2,aes(b))+geom_histogram(bins=10,aes(y=..density..))+geom_density(col="blue")
+
+p3<-ggplot(df3,aes(c))+geom_histogram(bins=10,aes(y=..density..))+geom_density(col="blue")
+
+p4<-ggplot(df4,aes(d))+geom_histogram(bins=10,aes(y=..density..))+geom_density(col="blue")
+
+grid.arrange(p1,p2,p3,p4,nrow=2)
+
+```
+
+As the size increasing, the data will be closer to a normal distribution.
+
+# Question 1B
+
+```{r}
+summary(a)
+sd(a)
+quantile(a, c(0.025, 0.25, 0.5, 0.75, 0.975))
+```
+
+```{r}
+summary(b)
+sd(b)
+quantile(b, c(0.025, 0.25, 0.5, 0.75, 0.975))
+```
+
+```{r}
+summary(c)
+sd(c)
+quantile(c, c(0.025, 0.25, 0.5, 0.75, 0.975))
+```
+
+```{r}
+summary(d)
+sd(d)
+quantile(d, c(0.025, 0.25, 0.5, 0.75, 0.975))
+```
+
+```{r}
+qnorm(c(.025, .25, .5, .75, .975),mean=100,sd=20)
+```
+
+For mean, the theoretical value is 100. 
+
+Sample size = 100, mean = 101.65. 
+
+Sample size = 1000, mean = 100.22. 
+
+Sample size = 10000, mean = 100.24.
+
+Sample size = 10000, mean = 100.10.
+
+
+For sd, the theoretical value is 20.
+
+Sample size = 100, sd = 20.88165. 
+
+Sample size = 1000, sd = 20.2446. 
+
+Sample size = 10000, sd = 20.02683. 
+
+Sample size = 100000, sd = 19.99937.
+
+
+For percentile (2.5, 25, 50, 75, 97.5), the theoretical value is (60.80072  86.51020 100.00000 113.48980 139.19928).
+
+Sample size = 100, percentile (2.5, 25, 50, 75, 97.5) = (63.05151  87.42281 103.07220 114.84038 143.84550).
+
+Sample size = 1000, percentile (2.5, 25, 50, 75, 97.5) = (60.22967  86.19834  99.87416 113.77874 136.93728).
+
+Sample size = 10000, percentile (2.5, 25, 50, 75, 97.5) = (60.84855  86.77171 100.33805 113.80948 139.55371).
+
+Sample size = 100000, percentile (2.5, 25, 50, 75, 97.5) = (60.9041  86.5363 100.1571 113.5054 139.4848).
+
+
+We can make a conclusion that as the sample size increasing, the mean, sd, percentile (2.5, 25, 50, 75, 97.5) will closer to the theoretical value.
+
+
+# Question 6
+
+## a)
+
+```{r}
+data <- read_table('vote.txt')
+ggplot(data,aes(x=growth, y=vote)) + geom_point() + geom_smooth(formula = y ~ x, method=lm, se=FALSE)
+```
+
+## b)
+
+```{r}
+lm <- lm(vote ~ growth , data)
+summary(lm)
+```
+$\hat{\beta_0}$ = 46.2476.It means if the average personal income growth in the pervious year is 0, the incumbent party's share of the two-party vote will be 46.2476 percent.
+
+$\hat{\beta_1}$ = 3.0605.It means as the average personal income growth in the pervious year increasing one unit, the incumbent party's share of the two-party vote will increase 3.0605 percent.
+
+
+## c)
+
+In R:
+```{r}
+
+predict(lm, data.frame(growth = 0.1))
+```
+
+By hands: 
+```{r}
+data
+```
+In 2018, the growth x is 0.1. 
+
+$\hat{Y}$ = $\hat{\beta_0}$ + $\hat{\beta_1}*X$ = 46.2476 + 3.0605 * 0.1 = 46.5536
+
+"Obama" would win. Because the vote rate for Obama is 54.4464 and the vote rate for Mccain is "46.5536".46.5536 is smaller than 54.4464(1- 46.5536).
+
+
+
+## d)
+
+$H_0 :\beta_1 = 0$
+
+$H_1 :\beta_1 > 0$
+  
+
+```{r}
+summary(lm)
+1-pt(4.396,14)
+```
+Therefore, the test statistics is 4.396.
+
+n = 16, n-2 = 14.
+
+p-value: $P(t_{14} > 4.396)$ = 0.0003047443
+
+p-value < 0.05, p-value < $\alpha$. Reject $H_0$.
+
+There is a positive association between incumbent party's vote share and economical growth.
+
+
+## e)
+
+By hands :
+```{r}
+qt(0.975, 14)
+```
+95% CI for $\beta_1$ : ( $\hat{\beta_1}$ - $t_{0.975,n-2} * se(\hat{\beta_1})$ , $\hat{\beta_1}$ + $t_{0.975,n-2} * se(\hat{\beta_1})$ )
+
+$\hat{\beta_1}$ = 3.0605
+
+$t_{0.975,n-2}$ = 2.144787
+
+$se(\hat{\beta_1})$ = 0.6963
+
+3.0605 - 2.144787 * 0.6963 = 1.567085
+
+3.0605 - 2.144787 * 0.6963 = 4.553915
+
+Answer:(1.567085, 4.553915)
+
+By R:
+```{r}
+confint(lm, level=0.95)
+```
+Answer:(1.567169, 4.553887)
+
+
+## f)
+
+## Step 1:depart the absolute sign
+
+$p(|\hat{\beta_1} - \beta| > 1)$ = $p(\hat{\beta_1} - \beta > 1)$ + $p(\hat{\beta_1} - \beta < -1)$
+
+## Step 2:multiply both side by 
+                                $se(\hat{\beta_1}):\ $
+                                
+$P(\frac{\hat{\beta_1} - \beta}{se(\hat{\beta_1})}>\frac{1}{se(\hat{\beta_1})})$ + $P((\frac{\hat{\beta_1} - \beta}{se(\hat{\beta_1})}<-\frac{1}{se(\hat{\beta_1})})$
+
+## Recall the test-statistic formula and using the porperty to find a more easy-handle data:
+$P(\frac{\hat{\beta_1} - \beta}{se(\hat{\beta_1})}>\frac{1}{se(\hat{\beta_1})}) = P(t^*(different\ than \ the\ t^*\ showed\ in (b)))>\frac{1}{se(\hat{\beta_1})})$
+$P((\frac{\hat{\beta_1} - \beta}{se(\hat{\beta_1})}<-\frac{1}{se(\hat{\beta_1})})= P(t^*(different\ than \ the\ t^*\ showed\ in (b)))<-\frac{1}{se(\hat{\beta_1})})$
+
+## with this data, we can compare to the p-value and using diagram to see the region:
+$since\ \frac{1}{se(\hat{\beta_1})}\ >\ 0\ ->\ P(t^*>\frac{1}{se(\hat{\beta_1})})\ is\ showing\ below\ :$
+```{r}
+sD <- 2;
+x <- seq(-5,5,by=0.1)
+y <- dnorm(x,sd=sD)
+right <- 2.5631031310892
+tail <- qnorm(0.9,sd=sD)
+plot(x,y,type="l",xaxt="n",ylab="",xlab=expression(paste('')),
+     axes=FALSE,ylim=c(0,max(y)*1.05),xlim=c(min(x),max(x)),
+       frame.plot=FALSE)
+axis(1,at=c(-5,right,0,5),labels=c(expression(' '),expression(1/SE(beta[1])),expression(' '),expression(' ')))
+xtail <- seq(right,6,by=0.1)
+ytail <- dnorm(xtail,sd=sD)
+polygon(c(xtail,xtail[length(xtail)],xtail[1]),
+          c(ytail, 0, 0), col='red')
+```
+
+$since\ \frac{1}{se(\hat{\beta_1})}\ >\ 0\ ->\ P(t^*>-\frac{1}{se(\hat{\beta_1})})\ is\ showing\ below\ :$
+```{r}
+sD <- 2;
+x <- seq(-5,5,by=0.1)
+y <- dnorm(x,sd=sD)
+tail <- qnorm(0.9,sd=sD)
+plot(x,y,type="l",xaxt="n",ylab="",xlab=expression(paste('')),
+     axes=FALSE,ylim=c(0,max(y)*1.05),xlim=c(min(x),max(x)),
+       frame.plot=FALSE)
+axis(1,at=c(-5,-right,0,5),labels=c(expression(' '),expression(-1/SE(beta[1])),expression(' '),expression(' ')))
+xtail <- seq(right,5,by=0.1)
+ytail <- dnorm(xtail,sd=sD)
+polygon(c(-xtail,-xtail[length(xtail)],-xtail[1]),
+          c(ytail, 0, 0), col='red')
+```
+
+## Based on the comparison and the two diagrams, we can conclude it is just :
+```{r}
+pt(1/0.6963,14,lower.tail = FALSE)*2
+```
+
+Answer: 0.1729238
+
+
+
+
+
+
+
+
+
+
+
+
