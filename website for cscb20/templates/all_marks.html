@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}
+CSCB20 Marks
+{% endblock %}
+
+{% block content %}
+    <section class="section">
+      <h2>All Students' Marks</h2>
+        <div class="info table-info">
+          <div class="table assignment">
+            <div class="heading">
+              <div class="cell-title"><p>User Name</p></div>
+              <div class="cell-title"><p>Work Name</p></div>
+              <div class="cell-title"><p>Grade</p></div>
+  
+            </div>
+            {% for mark in marks %}
+            <div class="row">
+                <div class="cell">
+                    <p>{{ mark.username }}</p>
+                </div>
+                <div class="cell">
+                    <p>{{ mark.workname }}</p>
+                </div>
+                <div class="cell">
+                    <p>{{ mark.mark }}</p>
+                </div>
+                
+                    <!-- <form action="/complete" methods ="POST">
+                      <input type="text" value="{{ mark.markid }}" style="display: none;" name="markid"> 
+                      <input type="submit" class="submit-remark1" value = "complete">
+                      <input type="submit" class="submit-remark2" value = "complete">
+                    </form>  -->
+              
+             </div>
+    
+
+            {% endfor %}
+          </div>
+        </div>
+        
+
+        <a href="/">Back to home page.</a>
+    </section>
+
+
+{% endblock %}
+

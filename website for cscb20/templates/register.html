@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+        <title>log in</title>
+        <link rel="stylesheet" href="../static/style/register.css">
+    </head>
+
+    <body>
+        <div class="masking"></div>
+        <div class="container">
+            <div class="form-box">
+                <!-- register -->
+                <form class="register-box hidden-register" action="/register">
+                    <h1>register</h1>
+                    <input class="text" type="text" name="username" placeholder="username">
+                    <input class="password" type="password" name="password" placeholder="password">
+                    <!-- <input class="password" placeholder="confirm password"> -->
+                    <select class="choose" name="type" aria-label="Default select example">
+                        <option selected>Register as:</option>
+                        <option value="0">Student</option>
+                        <option value="1">Instructor</option>
+                    </select>
+                    <input type="submit" value="register">
+                    {% if error %}
+                    <p class="red">This username is already exist.</p>
+                    {% endif %}
+                    {% if warning %}
+                    <p class="red">Wrong register information!</p>
+                    {% endif %}
+                </form>
+            </div>
+            <div class="con-box left">
+                <h2>Welcome to</h2>
+                <h2>CSCB20</h2>
+                <p>Already have an account?</p>
+                <a id="login" href="/login">log in</a>
+            </div>
+        </div>
+        <script src="../static/script/register.js"></script>
+    </body>
+
+</html>

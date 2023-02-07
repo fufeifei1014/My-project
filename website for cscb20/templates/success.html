@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}
+Enter/modify marks
+{% endblock %}
+
+{% block content%}
+    <div class="section">
+        <h2 class="content-subject">Enter/Modify Student Marks</h2>
+        <div class="form">
+            <form action="/postmark">
+                <label>Student name: </label>
+                <select name="username" id="student-select1" aria-label="Default select example">
+                    {% for student in student_names %}
+                    <option value="{{ student.username }}">{{ student.username }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label>Work name: </label>
+                <input type="text" name="workname" list="workname-list">
+                <datalist id="workname-list" aria-label="Default select example">
+                {% for workname in worknames %}
+                <option value="{{ workname.workname }}">{{ workname.workname }}</option>
+                {% endfor %}
+                </datalist>
+                <br>
+                <label>Grade: </label>
+                <input type="number" name="grade">
+                <br>
+                <p class="success-msg">submit success!</p>
+                <input class="submit" type="submit" value="submit">
+            </form>
+        </div>
+
+    </div>
+    
+{% endblock%}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style/base.css">
+    <title>CSCB20</title>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="title-name">CSCB20</div>
+        </div>
+        <div>
+            <div class="title-content" id="course-info">Introduction to Web and Database</div>
+            <div class="title-content" id="course-term">Winter 2021</div>
+        </div>
+    </header>
+    <main class="content"> 
+        {% block content %}
+        {% endblock %}
+    </main>
+    <div class="footer">
+        <div><a href="https://web.cs.toronto.edu/" target="blank_">Department of Computer Science at UofT.</a></div>
+        <div>Site designed by Purui Yi and Feifei Fu</div>
+    </div>
+</body>

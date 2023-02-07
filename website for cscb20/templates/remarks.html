@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}
+  Remarks
+{% endblock %}
+
+{% block content %}
+      
+    <section class="section">
+      <h2>Remark Requests</h2>
+        <div class="info table-info">
+          <div class="table assignment">
+
+            <div class="heading">
+              <div class="cell"><p>Username</p></div>
+              <div class="cell"><p>Work</p></div>
+              <div class="cell"><p>Grade</p></div>
+              <div class="cell"><p>Reason</p></div>
+              <div class="cell-title"><p>Statue</p></div>
+
+            </div>
+
+            {% for remark in remarks %}
+            <div class="row">
+              <div class="cell"><p>{{ remark.username }}</p></div>
+              <div class="cell"><p>{{ remark.workname }}</p></div>
+              <div class="cell"><p>{{ remark.mark }}</p></div>
+              <div class="cell"><p>{{ remark.text }}</p></div>
+
+              <div class="cell" >
+                <form action="/complete" methods ="POST">
+                  <input type="text" value="{{ remark.markid }}" style="display: none;" name="markid"> 
+                  <input type="submit" class="submit-remark1" value ="complete">
+                  <input type="submit" class="submit-remark2" value ="complete">
+              </form>
+
+            </div>
+            </div>
+            {% endfor %}
+
+          </div>
+          {% if warning %}
+          <p class="success-msg">Upload successfully!</p>
+          {% endif %}
+          {% if error %}
+          <p class="fail-msg">You've already processed this request.</p>
+          {% endif %}
+        </div>
+
+        <a href="/">Back to home page.</a>
+    </section>
+
+
+{% endblock %}

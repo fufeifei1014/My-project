@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}
+CSCB20 Marks
+{% endblock %}
+
+{% block content %}
+      
+    <section class="section">
+      <h2>{{ username }}'s Marks</h2>
+        <div class="info table-info">
+          <div class="table assignment">
+
+            <div class="heading">
+              
+              <div class="cell-title"><p>Work Name</p></div>
+              <div class="cell-title"><p>Grade</p></div>
+              <div class="cell-title"><p>Remark request</p></div>
+            </div>
+
+            {% for mark in marks %}
+            <div class="row">
+              <div class="cell">
+              <p>{{ mark.workname }}</p>
+              </div>
+              <div class="cell">
+                  <p>{{ mark.mark }}</p>
+              </div>
+              <div class="cell">
+                <form action="/remark" methods ="POST">
+                  <input type="text" value="{{ mark.markid }}" style="display: none;" name="markid"> 
+                  <textarea type="text" name = "text" style="overflow:auto"></textarea>
+                  <input type="submit" class="submit-remark1" value ="submit remark request">
+                  <input type="submit" class="submit-remark2" value ="submit">
+                </form> 
+            </div>
+          </div>
+
+              <!-- {% if not admin %}
+              <div class="cell">
+
+                <form action="/remark">
+                  <input type="text" value="{{ mark.mark_id }}" style="display: none;" name="mark_id">
+                  <input type="text" name="reason">
+                  <input type="submit">
+                </form>
+              </div>
+              {% endif %} -->
+            {% endfor %}
+          </div>
+        </div>
+        {% if warning %}
+        <p class="success-msg">Upload successfully!</p>
+        {% endif %}
+        {% if error %}
+        <p class="fail-msg">Reason please!</p>
+        {% endif %}
+
+        <a href="/">Back to home page.</a>
+    </section>
+
+
+{% endblock %}
+

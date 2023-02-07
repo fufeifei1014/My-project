@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style/index.css">
+    <title>CSCB20 Home</title>
+</head>
+<header class="background-box">
+    <div class="title-name target-menu">
+        <h1>CSCB20</h1>
+    </div>
+    <div class="title-content">
+        <h2 id="course-info">Introduction to Web & Databases</h2>
+        <h2 id="course-term">Winter 2021</h2>
+    </div>
+    
+    <img class="background-img" src="../static/images/back_nav_img.png" alt="">
+    <div class="menu-btn">
+        <a href="#target-menu" id="target-1">
+            <div class="menu-icon"></div>
+            <div class="menu-icon"></div>
+            <div class="menu-icon"></div>
+        </a>
+    </div>
+
+    <nav id="nav">
+        <ul id="target-menu" class="nav-bar">
+            <li class="nav-logo">
+                <div class="logo-box">
+                    <img class="logo" src="../static/images/database_icon.svg" alt="">
+                </div>
+            </li>
+            <li class="nav-content">
+                <a href="#welcome" NavTo="welcome">Welcome {{ username }}</a>
+            </li>
+            <li class="nav-content">
+                <a href="#home" NavTo="home">Home</a>
+            </li>
+            <li class="nav-content">
+                <a href="#syllabus" NavTo="syllabus">Syllabus</a>
+            </li>
+            <li class="nav-content">
+                <a href="#course-team">Course Team</a>
+            </li>
+            <li class="nav-content">
+                <a href="#assignment">Assignments</a>
+            </li>
+            <li class="nav-content">
+                <a href="#labs">Labs</a>
+            </li>
+            <li class="nav-content">
+                <a href="#Calendar"> Calendar</a>
+            </li>
+            <li class="nav-content">
+                <a href="/logout">Logout</a>
+            </li>
+            <li class="nav-logo"></li>
+                <div class="logo-box" id="target-3">
+                    <img class="logo" src="../static/images/web_application_icon.svg" alt="">
+                </div>
+            </li>   
+            <li class="nav-logo"></li>
+                <div class="menu-btn btn-box">
+                    <a href="#home" id="target-2">
+                        <img class="logo" src="../static/images/back_btn.svg" alt="">
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<body>
+    <span id="welcome" class="anchor"></span>
+    <div class="section">
+        <h2> Welcome {{ username }}!<h2>
+    
+        {% if session['type'] == 1 %}
+        <div class="info">
+        <p><strong>You have successfully logged on to the site as an instructor.</strong></p >
+        <a href="/all_marks">Click here to view all students' marks.</a><br>
+        <a href="/postmark">Click here to enter/modify students' marks.</a><br>
+        <a href="/remarks">Click here to see students' remark requests.</a><br>
+        <a href="/feedbacks">Click here to view students' feedbacks.</a><br>
+
+        </div>
+        {% endif %}
+        
+        {% if session['type'] == 0 %}
+        <div class="info">
+            <p><strong>You have successfully logged on to the site as a student.</strong></p >
+            <p><a href="/marks">click here to view your marks.</a></p>
+            <p><a href="/feedback">click here to upload your feedbacks for this course.</a></p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <span id="home" class="anchor"></span>
+    <div class="section">
+        <h2>Introduction</h2>
+        <div class="info">
+            <iframe class="insert" src="https://www.youtube.com/embed/FR4QIeZaPeM" title="Introduction" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    
+        <h2>Course Description</h2>
+        <div class="info">
+            <p>A practical introduction to databases and Web app development. Databases: terminology and applications; creating, querying and updating databases; the entity-relationship model for database design. Web documents and applications: static and interactive documents; Web servers and dynamic server-generated content; Web application development and interface with databases.</p >
+            <p><span class="strong">Exclusion:</span> This course may not be taken after - or concurrently with - any C- or D-level CSC course.</p >
+            <p><span class="strong">Prerequisite:</span> Some experience with programming in an imperative language such as Python, Java or C.</p >
+            </p >
+        </div>
+    
+        <h2>Textbook & Lecture Notes</h2>
+        <div class="info">
+        <p>
+        Practical Programming (2nd edition): An Introduction to
+        Computer Science Using Python 3 by Paul Gries, Jennifer
+        Campbell, Jason Montojo, The Pragmatic Bookshelf, 2013.</p>
+        </div>
+    
+        <h2>Online Resources</h2>
+        <div class="info">
+        <ul>
+            <li>
+                <a href="#">Course website. </a>Course information, lecture notes, tutorial material, important announcements, etc. will be posted on the course website. It is your responsibility to visit it frequently.<br>
+            </li>
+            <li>
+                How To Think Like A Computer Scientist. An excellent <a href="https://openbookproject.net/thinkcs/python/english3e/">online 
+                tutorial</a>.
+            </li>
+            <li>
+                Email communication<br>
+                Questions regarding the course material, assignments, midterm,
+                etc. should be posed on the bulletin board. Questions about
+                the assignment which you feel you cannot formulate without
+                revealing your solution (should be very rare!), as well as
+                questions and concerns regarding your personal matters should
+                be directed to the instructor.<br> 
+            </li>
+            </ul>
+        </div>
+    
+        <h2>Software and documentation</h2>
+        <div class="info">
+            <ul>
+                <li>Python: <a href="https://python.org/downloads">python.org/downloads</a></li>
+                <li>Wing IDE: <a href="http://wingware.com/downloads/wingide-101">Wing 101</a></li>
+                <li>Python Visualizer:
+                    <a href="http://www.pythontutor.com/visualize.html">http://www.pythontutor.com/visualize.html</a>
+                    <p> You will need to select the following options in the visualizer:</p>
+                    <div class="list">
+                        <ul>
+                        <li> Python 3.x</li>
+                        <li> hide frames of exited functions </li>
+                        <li> render all objects on the heap </li>
+                        <li> hide environment parent pointers </li>
+                        <li> use text labels for references </li>
+                        <li> show everything </li>
+                        </ul>
+                    </div>
+                    Alternatively, you can get these options by navigating to pythontutor using <a href="http://www.pythontutor.com/visualize.html#code=x+%3D+%5B1,+2,+3%5D%0Ay+%3D+%5B4,+5,+6%5D%0Az+%3D+y%0Ay+%3D+x%0Ax+%3D+z%0A%0Ax+%3D+%5B1,+2,+3%5D+%23+a+different+%5B1,+2,+3%5D+list!%0Ay+%3D+x%0Ax.append(4)%0Ay.append(5)%0Az+%3D+%5B1,+2,+3,+4,+5%5D+%23+a+different+list!%0Ax.append(6)%0Ay.append(7)%0Ay+%3D+%22hello%22%0A%0A%0Adef+foo(lst)%3A%0A++++lst.append(%22hello%22)%0A++++bar(lst)%0A%0Adef+bar(myLst)%3A%0A++++print(myLst)%0A%0Afoo(x)%0Afoo(z)&amp;mode=display&amp;cumulative=false&amp;heapPrimitives=true&amp;drawParentPointers=false&amp;textReferences=true&amp;showOnlyOutputs=false&amp;py=3&amp;curInstr=0">this link</a>.
+                    </li>
+                <li> The style-checker:
+                    <p>You can use the <a href="http://pep8online.com">PEP8 Online</a> code checker.  It is simple to use - you can paste your entire file in or upload it.</p>
+                </li>
+                <li> The Python Style Guidelines we are enforcing in this courseare detailed <a href="http://www.python.org/dev/peps/pep-0008/">here</a>.<br></li>
+            </ul>
+        </div>
+    
+    
+        <h2>News</h2>
+        <div class="info">
+            <h5>Jan.2</h5>
+            
+            <p>Welcome to CSCB20. Please note that tutorials will begin in week 2.</p>
+            <h5>Apr.12</h5>
+            
+            <p>Good luck!</p>
+        </div>
+        
+        
+    </div>
+    
+    <span id="course-team" class="anchor"></span>
+    <div class="section">
+        <h2>Course Team</h2>
+        <div class="info">
+            <h3>Instructor</h3>
+            <p><strong>Dr. Anna Bretscher</strong></p >
+            <img class="photo" src="/static/images/photo.png" alt="">
+            <ul>
+            <li><strong>Email:</strong><a href="mailto:bretscher@utsc.utoronto.ca">bretscher@utsc.utoronto.ca</a></li>
+            <li><strong>Office:</strong> <a href="https://map.concept3d.com/?id=1809#!ce/48654?sbc/?s/IC">IC493</a> 
+                <strong><a href = "#map">(view map)</a></li></strong>
+            <li><strong>Phone:</strong> (416) 208-4745</li>
+            <li><strong>Lectures:</strong> Mondays 9:15-11:00 in <a href="https://map.concept3d.com/?id=1809#!ce/48654?sbc/?s/HW">HW216 </a><strong><a href = "#map">(view map)</a></li></strong></li>
+    
+            <li><strong>Office Hours:</strong> W 11:00-12:00</li>
+            </ul>
+    
+            <h3>TA</h3>   
+            <p><strong>Alice Wu</strong></p >
+            <img class="photo" src="/static/images/photo2.png" alt="">
+            <ul>
+            <li><strong>Email:</strong><a href="mailto:alice.wu@mail.utoronto.ca">bretscher@utsc.utoronto.ca</a></li>
+            <li><strong>Phone:</strong> (416) 999-9999</li>
+            <li><strong>Office Hours:</strong> W 16:00-18:00</li>
+            </ul>
+        </div>
+    </div>
+    
+    <span id="syllabus" class="anchor"></span>
+    <div class="section">
+        <h2>Syllabus</h2>
+        <h3>Grading Scheme</h3>
+        <div id="grading" class="tabcontent active">
+            <div class="table exercises">
+                <div class="heading">
+                    <div class="cell"><p>Work</p></div>
+                    <div class="cell"><p>Weight</p></div>
+                    <div class="cell"><p>Comment</p></div>
+                </div>
+                <div class="row">
+                    <div class="cell">
+                        <p>Weekly Labs</p>
+                    </div>
+                    <div class="cell">
+                        <p>10%</p>
+                    </div>
+                    <div class="cell">
+                        <p>1% each, 1 grace lab</p>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="cell">
+                        <p>Assignments (3)</p>
+                    </div>
+                    <div class="cell">
+                        <p>30%</p>
+                    </div>
+                        <div class="cell">
+                        <p>10% each</p>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="cell">
+                        <p>Exercises (6)</p>
+                    </div>
+                    <div class="cell">
+                        <p>25%</p>
+                    </div>
+                    <div class="cell">
+                    <p>5% each, drop the worst one</p>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="cell">
+                        <p>Final exam</p>
+                    </div>
+                    <div class="cell">
+                        <p>35%</p>
+                    </div>
+                    <div class="cell">
+                        <p>You must score at least 40% on the final to pass the course.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <h3>Lecture Schedule</h3>
+        <div id="grading" class="tabcontent active">
+            <div class="table exercises">
+                <div class="heading">
+                    <div class="cell"><p>Week</p></div>
+                    <div class="cell"><p>Topic</p></div>
+                    <div class="cell"><p>Lecture Material</p></div>
+                    <div class="cell"><p>In class</p></div>
+                </div>
+    
+            <div class="row">
+                <div class="cell"> <p>1</p> </div>
+                <div class="cell"> <p>Introduction, Databases background</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week1lec.pdf">Week1.pdf
+                    </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>2</p> </div>
+                <div class="cell"> <p>Schema Diagrams, Relational Algebra</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week2lec.pdf">Week2.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>3</p> </div>
+                <div class="cell"> <p>Schema Diagrams, Relational Algebra</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week3lec.pdf">Week3.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>4</p> </div>
+                <div class="cell"> <p>SQL and MySQL</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week4lec.pdf">Week4.pdf
+                </a></div>
+                <div class="cell"><a href="couresinfo/lectureppt/week4inclass.sql">In Class MySQL</a></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>5</p> </div>
+                <div class="cell"> <p>MySQL Queries, Creating and Editing Tables</p> </div>
+                
+                    <div class="cell"> <a href="couresinfo/lectureppt/week5lec.pdf">Week5.pdf
+                    </a></div>
+                    <div class="cell"><a href="couresinfo/lectureppt/week5inclass.sql">In Class MySQL</a></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>6</p> </div>
+                <div class="cell"> <p>MySQL Outer Joins, Views, NULL, string functions, HTML</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week6lec.pdf">Week6.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+                
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>7</p> </div>
+                <div class="cell"> <p>HTML, CSS</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week7lec.pdf">Week7.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>8</p> </div>
+                <div class="cell"> <p>PHP</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week8lec.pdf">Week8.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>9</p> </div>
+                <div class="cell"> <p>PHP and SQL</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week9lec.pdf">Week9.pdf
+                </a></div>
+                <div class="cell"><p>To look at the txt for this file, download this <a href="couresinfo//week9inclass.txt">php_query.txt</a>
+                    </p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>10</p> </div>
+                <div class="cell"> <p>JavaScript and jQuery</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week10lec.pdf">Week10.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>11</p> </div>
+                <div class="cell"> <p>jQuery, AJAX, JSON</p> </div>
+                <div class="cell"> <a href="couresinfo/lectureppt/week11lec.pdf">Week11.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+    
+            <div class="row">
+                <div class="cell"> <p>12</p> </div>
+                <div class="cell"> <p>Last Year's final</p> </div>
+                <div class="cell"> <a href="couresinfo/week12lec.pdf">Week12.pdf
+                </a></div>
+                <div class="cell"><p></p></div>
+            </div>
+        </div>
+        <h3>Test</h3>
+        <br>
+        <div class="weekly-layout">
+            <div class="lab-module">
+        
+            <h3>Midterm</h3>
+            
+            
+            <p>here will be one midterm. The midterm will be 75min in length. You should go to either <a href="https://map.concept3d.com/?id=1809#!ce/48654?sbc/?s/HW">HW215</a> or <a href="https://map.concept3d.com/?id=1809#!ce/48654?sbc/?s/HW">HW216</a> depending on your last name as shown here.<strong><a href = "#map">(view map)</a></li></strong></p>
+            <h4>Weight</h4>
+            <p>25%</p>
+            <h4>comment</h4>
+            <ul>
+                <li>Understand all parts of A1.</li>
+                <li>The midterm will cover everything on databases that we did from the start until part way through the week 6 lecture.</li>
+            </ul>  
+            
+            </div>
+    
+            <div class="lab-module">
+            <div>
+                <h3>Final</h3>
+                <p>To be uodated soon!</p>
+                <h4>Weight</h4>
+                <p>35%</p>
+                <h4>comment</h4>
+                <p>To be updated soon!</p>
+                </div>
+            </div>
+    
+    </div>
+    <br>
+    <p>Here is the room allocation of midterm</p>
+    <img class="centre" src="/static/images/B20_rooms.jpg" alt="">
+    <br>
+            <p>You can cilck <a href="couresinfo/syllabus.pdf">here</a> to see the complete syllabus.</p >
+            
+        
+        </div>
+    </div>
+    
+    <span id="assignment" class="anchor"></span>
+    <div class="section">
+        <h2>Assignment</h2>
+            <p>There are three assignments. You may be asked to work in pairs in some of these assignments. Please check the assignment handout for these details for the exact due date and whether you can work in groups or not. DO NOT EMAIL YOUR ASSIGNMENTS TO US. We will use MARKUS for the submission of all assignments. ALL ASSIGNMENTS WILL MARKED ON UTSC LAB MACHINES. IT IS IMPORTANT BEFORE SUBMITTING YOUR ASSIGNMENT, TO MAKE SURE THAT IT COMPILES AND EXECUTES ON THE UTSC LAB MACHINES. A STRICT silent policy takes effect 12 hours before an ASSIGNMENT or EXAM is due. This means no question about the assignment will be answered by instructor or the TA whether it is asked on the bulletin board, by email or in person.</p><br>
+            <div class="weekly-layout">
+                <div class="lab-module">
+            <div>
+                <h3>Assignment 1</h3>
+                
+                <h4>Topic</h4>
+                <p>Relational Algebra and MySQL.</p>
+                <h4>Weight</h4>
+                <p>15%</p>
+                <h4>Due date and submission</h4>
+                <p>Part 1. Wednesday Feb. 1, 11.59pm, Submit to <a href="https://markus.utsc.utoronto.ca/cscb20w22/">MarkUs</a>.<br>
+                    <p class= "updated">UPDATED</p> Part 2 and 3. For 5% bonus Saturday Feb. 11, 11.59pm or Friday Feb. 17, 11.59 Submit to <a href="https://markus.utsc.utoronto.ca/cscb20w22/">MarkUs</a>. You can download a dumpfile for IMDB_SMALL </p>
+                <h4>Exercise</h4>
+                <p><a href="couresinfo/assignment/CSCB20A1.pdf">CSCB20 A1.pdf</a></p>
+                <h4>Solution</h4>
+                <p><a href="couresinfo/assignment/a1solutions.pdf">CSCB20 A1 solution.pdf</a></p>
+                </div>
+            </div>
+                <div class="lab-module">
+                <div >
+                    <h3>Assignment 2</h3>
+                    
+                    <h4>Topic</h4>
+                    <p>HTML, CSS, PHP</p>
+                    <h4>Weight</h4>
+                    <p>15%</p>
+                    <h4>Due date and submission</h4>
+                    <p> 
+                        Part 1: Worth 50% Friday March. 10, 11.59pm, Submit to <a href="https://markus.utsc.utoronto.ca/cscb20w22/">MarkUs</a>.<br>
+                        Part 2: Worth 50% Friday March. 19, 11.59pm, Submit to <a href="https://markus.utsc.utoronto.ca/cscb20w22/">MarkUs</a>.<p>
+                    <h4>Exercise</h4>
+                    <p><a href="couresinfo/assignment/B20Assignment2.pdf">CSCB20 A2.pdf</a></p>
+                </div>
+        </div>
+                <div class="lab-module">
+            <div >
+                <h3>Assignment 3</h3>
+                <h4>Web Application and Database</h4>
+                <p>HTML, CSS, PHP</p>
+                <h4>Weight</h4>
+                <p>15%</p>
+                <h4>Due date and submission</h4>
+                <p>Friday March 31, 11.59pm.<p>
+                <h4>Exercise</h4>
+                <p>will be released at Mar.25</p>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <span id="labs" class="anchor"></span>
+    <div class="section">
+        <h2>Lab Section</h2>
+        <p>
+            Please go the lab section that you signed up for on ROSI for the first hour. You may attend the second hour of any lab you wish if you need extra help.
+            </p>
+    
+            <p> Submit your lab exercises to <a href="https://markus.utsc.utoronto.ca/cscb20w22/">MarkUs</a>.</p>
+    
+        <h2>Lab Exercises</h2>
+        <p>This section contains the lab exercises. Labs are held every week. The first lab week is the week of September 14th. Please make use of this valuable resource!</p>
+            <div id="lab exercises" class="tabcontent active">
+    
+        <div class="table exercises">
+                    <div class="heading">
+                    <div class="cell"><p>Week</p></div>
+                    <div class="cell"><p>Lab</p></div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week1</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week1lab.pdf">Python, Command line</a>
+                    </div>
+                    
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week2</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week2lab.pdf">Schema Diagrams</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week3</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week3lab.pdf">RA</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week4</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week4lab.pdf">	
+                            SQL and MySQL</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week5</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week5lab.pdf">MySQL Queries</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week6</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week6lab.pdf">HTML</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week7</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week7lab.pdf">CSS</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week8</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week8lab.pdf">PHP</a>
+                    </div>
+                    </div>
+    
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week9</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week9lab.pdf">	
+                            JavaScript</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week10</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week10lab.pdf">jQuery, AJAX</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week11</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week11lab.pdf">JSON</a>
+                    </div>
+                    </div>
+    
+                    <div class="row">
+                    <div class="cell">
+                        <p>Week12</a></p>
+                    </div>
+                    <div class="cell">
+                        <a href="couresinfo/lectureppt/week12lab.pdf">	
+                            Last Year's final</a>
+                    </div>
+                    </div>
+    
+                </div>
+    
+    
+                </div>
+        </div>
+    </div>
+    
+    <span id="Calendar" class="anchor"></span>
+    <div class="section">
+        <h2>Calendar</h2>
+    <iframe class="insert" src="https://calendar.google.com/calendar/embed?src=fkpoe1j1vq03eqod62618rdr34%40group.calendar.google.com&ctz=America%2FToronto" frameborder="0" scrolling="no"></iframe>
+    </div>
+    
+    <span id="map" class="anchor"></span>
+        <div class="section">
+            <h2>Map</h2>
+            <iframe class="insert" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2181.82775910088!2d-79.18678970914519!3d43.78280320524686!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89d4da6fb7abd57f%3A0xbb656e0169887bac!2z5aSa5Lym5aSa5aSn5a2m4oCi5aOr5ZiJ5aCh5qCh5Yy6!5e0!3m2!1szh-CN!2sca!4v1647547765594!5m2!1szh-CN!2sca" positive="relative" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+    
+    <span id="feedback" class="anchor"></span>   
+</body>
+
+<div class="footer">
+    <div><a href="https://web.cs.toronto.edu/" target="blank_">Department of Computer Science at UofT.</a></div>
+    <div>Site designed by Purui Yi and Feifei Fu</div>
+</div>
+</html>
+
